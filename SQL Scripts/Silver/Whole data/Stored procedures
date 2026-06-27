@@ -1,1 +1,143 @@
+-- Bronze layer stored procedure
+
+CREATE OR ALTER  PROCEDURE [bronze].[load_bronze] AS
+BEGIN
+	DECLARE @STARTTIME DATETIME ,@ENDTIME DATETIME, @COMPLETE_LAYER_START_TIME DATETIME, @COMPLETE_LAYER_END_TIME DATETIME
+	BEGIN TRY 
+		SET @COMPLETE_LAYER_START_TIME = GETDATE()
+
+		PRINT '==================================================='
+		PRINT 'LOADING BRONZE LAYER'
+		PRINT '==================================================='
+
+		PRINT '----------------------------------------'
+		PRINT 'UPDATED THE CRM TABLE'
+		PRINT '----------------------------------------'
+
+		SET @STARTTIME = GETDATE()
+
+		PRINT 'TRUNCATING THE TABLE : bronze.crm_cust_info'
+		TRUNCATE TABLE bronze.crm_cust_info 
+		PRINT 'INSERTING THE DATA INTO TABLE : bronze.crm_cust_info'
+		BULK INSERT bronze.crm_cust_info
+		from 'C:\Users\lenovo\OneDrive\Desktop\sql-data-warehouse-project\datasets\source_crm\cust_info.csv'
+			WITH(
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ',',
+			TABLOCK
+		)
+		SET @ENDTIME = GETDATE()
+
+		PRINT 'RUNNING DURATION : ' + CAST (DATEDIFF (SECOND, @STARTTIME, @ENDTIME) AS NVARCHAR) + ' SECONDS'
+		
+		PRINT '------------------------------------------'
+
+		SET @STARTTIME = GETDATE()
+
+		PRINT 'TRUNCATING THE TABLE : bronze.crm_prd_info'
+		TRUNCATE TABLE bronze.crm_prd_info 
+		PRINT 'INSERTING THE DATA INTO TABLE : bronze.crm_prd_info'
+		BULK INSERT bronze.crm_prd_info
+		from 'C:\Users\lenovo\OneDrive\Desktop\sql-data-warehouse-project\datasets\source_crm\prd_info.CSV'
+			WITH(
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ',',
+			TABLOCK
+		)
+		SET @ENDTIME = GETDATE()
+
+		PRINT 'RUNNING DURATION : ' + CAST (DATEDIFF (SECOND, @STARTTIME, @ENDTIME) AS NVARCHAR) + ' SECONDS'
+		PRINT '------------------------------------------'
+
+
+		SET @STARTTIME = GETDATE()
+
+		PRINT 'TRUNCATING THE TABLE : bronze.crm_sales_details'
+		TRUNCATE TABLE bronze.crm_sales_details 
+
+		PRINT 'INSERTING THE DATA INTO TABLE : bronze.crm_sales_details'
+		BULK INSERT bronze.crm_sales_details
+		from 'C:\Users\lenovo\OneDrive\Desktop\sql-data-warehouse-project\datasets\source_crm\sales_details.CSV'
+			WITH(
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ',',
+			TABLOCK
+		)
+		SET @ENDTIME = GETDATE()
+
+		PRINT 'RUNNING DURATION : ' + CAST (DATEDIFF (SECOND, @STARTTIME, @ENDTIME) AS NVARCHAR) + ' SECONDS'
+
+
+		PRINT '----------------------------------------'
+		PRINT 'UPDATED THE ERP TABLE'
+		PRINT '----------------------------------------'
+
+
+		SET @STARTTIME = GETDATE()
+
+		PRINT 'TRUNCATING THE TABLE : bronze.erp_loc_a101'
+		TRUNCATE TABLE bronze.erp_loc_a101
+
+		PRINT 'INSERTING THE DATA INTO TABLE : bronze.erp_loc_a101'
+		BULK INSERT  bronze.erp_loc_a101
+		from 'C:\Users\lenovo\OneDrive\Desktop\sql-data-warehouse-project\datasets\source_erp\loc_a101.CSV'
+			WITH(
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ',',
+			TABLOCK
+		)
+		SET @ENDTIME = GETDATE()
+		PRINT 'RUNNING DURATION : ' + CAST (DATEDIFF (SECOND, @STARTTIME, @ENDTIME) AS NVARCHAR) + ' SECONDS'
+
+		PRINT '------------------------------------------'
+
+		SET @STARTTIME = GETDATE()
+		PRINT 'TRUNCATING THE TABLE : bronze.erp_cust_az12'
+		TRUNCATE TABLE bronze.erp_cust_az12
+
+		PRINT 'INSERTING THE DATA INTO TABLE : bronze.erp_cust_az12'
+		BULK INSERT  bronze.erp_cust_az12
+		from 'C:\Users\lenovo\OneDrive\Desktop\sql-data-warehouse-project\datasets\source_erp\cust_az12.CSV'
+			WITH(
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ',',
+			TABLOCK
+		)
+		SET @ENDTIME = GETDATE()
+
+		PRINT 'RUNNING DURATION : ' + CAST (DATEDIFF (SECOND, @STARTTIME, @ENDTIME) AS NVARCHAR) + ' SECONDS'
+
+		PRINT '------------------------------------------'
+
+		SET @STARTTIME = GETDATE()
+
+		PRINT 'TRUNCATING THE TABLE : bronze.erp_px_cat_glv2'
+		TRUNCATE TABLE bronze.erp_px_cat_glv2
+
+		PRINT 'INSERTING THE DATA INTO TABLE : bronze.erp_px_cat_glv2'
+		BULK INSERT  bronze.erp_px_cat_glv2
+		from 'C:\Users\lenovo\OneDrive\Desktop\sql-data-warehouse-project\datasets\source_erp\PX_CAT_G1V2.csv'
+			WITH(
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ',',
+			TABLOCK
+		)
+		SET @ENDTIME = GETDATE()
+		PRINT 'RUNNING DURATION : '+ CAST (DATEDIFF (SECOND, @STARTTIME, @ENDTIME) AS NVARCHAR) + ' SECONDS'
+		PRINT '------------------------------------------'
+		SET @COMPLETE_LAYER_END_TIME = GETDATE()
+
+		PRINT '=========================================='
+		PRINT 'BRONZE LAYER COMPLETED'
+		PRINT 'COMPLETE DURATIO : '+ CAST (DATEDIFF(SECOND, @COMPLETE_LAYER_START_TIME, @COMPLETE_LAYER_END_TIME) AS NVARCHAR) + ' SECONDS'
+		PRINT '=========================================='
+	END TRY
+	BEGIN CATCH 
+		PRINT '------------------------------------------------------'
+		PRINT 'ERROR IS OCCURED, PLEASE CHECK THE ERROR DETAILS BELOW'
+		PRINT 'ERROR MESSAGE :'+ ERROR_MESSAGE()
+		PRINT 'ERROR MUMBER : '+ CAST(ERROR_NUMBER() AS NVARCHAR)
+		PRINT '------------------------------------------------------'
+	END CATCH
+END
 
