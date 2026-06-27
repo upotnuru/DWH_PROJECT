@@ -1,3 +1,5 @@
+Creating silver tables
+
 Use DWH_PROJECT
 
 IF OBJECT_ID ('silver.crm_cust_info', 'U') IS NOT NULL
